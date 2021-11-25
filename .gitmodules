@@ -1,0 +1,3 @@
+[submodule "novafold/models/mxfold2/src/pybind11"]
+	path = novafold/models/mxfold2/src/pybind11
+	url = git://github.com/pybind/pybind11.git
