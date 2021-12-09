@@ -1,5 +1,5 @@
-/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/rebuild_cache.dir
-/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/edit_cache.dir
-/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir
-/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/pybind11/CMakeFiles/rebuild_cache.dir
-/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/pybind11/CMakeFiles/edit_cache.dir
+/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/rebuild_cache.dir
+/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/edit_cache.dir
+/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir
+/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/pybind11/CMakeFiles/rebuild_cache.dir
+/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/pybind11/CMakeFiles/edit_cache.dir

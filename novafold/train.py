@@ -20,7 +20,7 @@ def train(args):
     else:
         seed = int(time.time())
         utils.set_seed(seed)
-        print(f'seed: {seed}')
+        print("seed: %u "%seed)
     device = torch.device('cuda:0' if args.device == 'gpu' and torch.cuda.is_available() else 'cpu')
     print(f'device: {device}, CUDA Available: {torch.cuda.is_available()}')
     
@@ -38,7 +38,12 @@ def train(args):
     
     compute_loss = Loss(args, model).to(device)
     
-    optimizer = optim.RAdam(params=model.parameters(), lr=args.lr)
+    try:
+        optimizer = optim.RAdam(params=model.parameters(), lr=args.lr)
+    except:
+        optimizer = optim.Adam(params=model.parameters(), lr=args.lr)
+        
+        
     
     model.train()
     print("Start training...")

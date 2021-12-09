@@ -70,6 +70,7 @@ class StructuredLossWithTurner(nn.Module):
 
 
     def forward(self, seq, pairs, fname=None):
+
         pred, pred_s, _, param = self.model(seq, return_param=True, reference=pairs,
                                 loss_pos_paired=self.loss_pos_paired, loss_neg_paired=self.loss_neg_paired, 
                                 loss_pos_unpaired=self.loss_pos_unpaired, loss_neg_unpaired=self.loss_neg_unpaired)

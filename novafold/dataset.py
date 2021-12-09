@@ -57,7 +57,9 @@ class NovaDataset(Dataset):
                         else:
                             raise RuntimeError('invalid format: {}'.format(filename))
             seq = ''.join(s)
-            return (seq, torch.tensor(pairs))
+            # print(len(seq))
+            # print(torch.tensor(pairs).shape)
+            return seq, torch.tensor(pairs)
             # return (filename, seq, torch.tensor(pairs))
         elif args.model == 'e2efold':
             with open(filename) as f:

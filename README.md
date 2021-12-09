@@ -14,3 +14,11 @@ RNA Secondary Structure Prediction. Final Project for CS410: AI.
 # Usage
 Place the dataset (archivell, etc.) in the `data/` and use `--data-root` to set it.
 
+go into the `novafold/models/mxfold2/src`:
+
+git submodule update --init
+
+cmake .
+
+make
+

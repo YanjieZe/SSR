@@ -22,7 +22,10 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
     random.seed(seed)
     np.random.seed(seed)
-    torch.use_deterministic_algorithms(True)
+    try:
+        torch.use_deterministic_algorithms(True)
+    except:
+        pass
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
@@ -51,6 +54,7 @@ def build_model(args):
             'pair_join': args.pair_join,
             'no_split_lr': args.no_split_lr,
         }
+
         if args.model_type is None or args.model_type == 'Turner':
             return RNAFold()
         elif args.model_type == 'Zuker':

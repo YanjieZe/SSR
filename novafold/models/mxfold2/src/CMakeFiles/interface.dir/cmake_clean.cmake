@@ -7,7 +7,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/interface.dir/param/mix.cpp.o"
   "CMakeFiles/interface.dir/param/positional.cpp.o"
   "CMakeFiles/interface.dir/param/turner.cpp.o"
-  "interface.cpython-37m-x86_64-linux-gnu.so"
+  "interface.cpython-37m-darwin.so"
   "interface.pdb"
 )
 

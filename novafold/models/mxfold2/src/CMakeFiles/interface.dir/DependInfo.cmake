@@ -4,16 +4,16 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/fold/fold.cpp" "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir/fold/fold.cpp.o"
-  "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/fold/nussinov.cpp" "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir/fold/nussinov.cpp.o"
-  "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/fold/zuker.cpp" "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir/fold/zuker.cpp.o"
-  "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/interface.cpp" "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir/interface.cpp.o"
-  "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/param/bpscore.cpp" "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir/param/bpscore.cpp.o"
-  "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/param/mix.cpp" "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir/param/mix.cpp.o"
-  "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/param/positional.cpp" "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir/param/positional.cpp.o"
-  "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/param/turner.cpp" "/home/purewhite/workspace/ai-proj/novafold/models/mxfold2/src/CMakeFiles/interface.dir/param/turner.cpp.o"
+  "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/fold/fold.cpp" "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir/fold/fold.cpp.o"
+  "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/fold/nussinov.cpp" "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir/fold/nussinov.cpp.o"
+  "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/fold/zuker.cpp" "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir/fold/zuker.cpp.o"
+  "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/interface.cpp" "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir/interface.cpp.o"
+  "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/param/bpscore.cpp" "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir/param/bpscore.cpp.o"
+  "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/param/mix.cpp" "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir/param/mix.cpp.o"
+  "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/param/positional.cpp" "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir/param/positional.cpp.o"
+  "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/param/turner.cpp" "/Users/yanjieze/Documents/code/RNA-SSP/novafold/models/mxfold2/src/CMakeFiles/interface.dir/param/turner.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "GNU")
+set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # Preprocessor definitions for this target.
 set(CMAKE_TARGET_DEFINITIONS_CXX
@@ -23,7 +23,7 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "pybind11/include"
-  "/home/purewhite/anaconda3/envs/cs231n/include/python3.7m"
+  "/opt/anaconda3/envs/python3pt7/include/python3.7m"
   )
 
 # Targets to which this target links.
