@@ -15,6 +15,11 @@ except:
 	print('Wandb is not installed in your env. Skip `import wandb`.')
 
 def train(args):
+    if args.wandb:
+		# wandb.login(key=args.wandb_key)
+        wandb.init(project=args.wandb_project, name=args.wandb_name, \
+            group=args.wandb_group, job_type=args.wandb_job)
+    
     if (args.seed is not None):
         utils.set_seed(args.seed)
     else:
@@ -62,7 +67,7 @@ def train(args):
             optimizer.step()
             
             if args.wandb:
-                wandb.log({'loss' : loss.item()})
+                wandb.log({'train/loss' : loss.item()})
             
             loop.set_description(f'Epoch [{e}/{args.epoch}], Iter [{idx}/{len(loop)}]')
             loop.set_postfix(loss = loss.item())

@@ -1,24 +1,24 @@
 # RNA-SSP
 RNA Secondary Structure Prediction. Final Project for CS410: AI.
 
-# To Do List
-- [x] Figure out the code structure
-- [x] Data Loader 
-- [ ] Model Zoo:
-    - [ ] LinearFold (Qi Liu)
-    - [x] E2EFold (Xudong Lu, Qi Liu)
-    - [x] MXFold (Yanjie Ze, Qi Liu)
-- [ ] Basic Experiment
-- [ ] Propose our own method
+# mxfold2编译过程
 
-# Usage
-Place the dataset (archivell, etc.) in the `data/` and use `--data-root` to set it.
-
-go into the `novafold/models/mxfold2/src`:
-
+```
+cd novafold/models/mxfold2/src/
 git submodule update --init
-
-cmake .
-
+rm -rf CMakeFiles
+rm CMakeCache.txt
+rm cmake_install.cmake
+mkdir build
+cd build
+cmake ..
 make
+```
+
+# 用script跑样例
+
+```
+sh scripts/train_mxfold2.sh
+```
+
 
