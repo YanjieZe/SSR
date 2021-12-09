@@ -172,7 +172,7 @@ class ContactAttention_simple(nn.Module):
         self.conv_test_3 = nn.Conv2d(in_channels=d, out_channels=1, kernel_size=1)
 
         self.position_embedding_1d = nn.Parameter(
-            torch.randn(1, d, 600)
+            torch.randn(1, d, L)
         )
 
         # transformer encoder for the input sequences

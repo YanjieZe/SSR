@@ -78,6 +78,7 @@ def build_model(args):
     elif model_name == 'e2efold':
         d = args.u_net_d
         seq_len = args.seq_max_len
+        print("mxlen", args.seq_max_len)
         if args.model_type =='test_lc':
             return ContactNetwork_test(d=d, L=seq_len)
         if args.model_type == 'att6':

@@ -40,9 +40,8 @@ def parse_args(args=None):
     
     # model specific
     # e2efold    
-    parser.add_argument('--seq_max_len', default=600, type=int)
-    parser.add_argument('--u_net_d', default=10, type=int)
-    parser.add_argument('--model_type', default=None, type=str)
+    parser.add_argument('--seq-max-len', default=600, type=int)
+    parser.add_argument('--u-net-d', default=10, type=int)
     
     # mxfold2
     parser.add_argument('--loss-func', choices=('hinge', 'hinge_mix'), default='hinge',

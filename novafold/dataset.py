@@ -13,7 +13,7 @@ class NovaDataset(Dataset):
         if args.model == 'e2efold':
             self.seq_max_len = args.seq_max_len
         self.path_list = []
-        self.args = args
+        self.model = args.model
         # self.data = []
         train_set = args.train_set.split(',')
         for lst in train_set:
@@ -34,11 +34,11 @@ class NovaDataset(Dataset):
         # return len(self.data)
 
     def __getitem__(self, idx):
-        return self.read(self.path_list[idx], self.args)
+        return self.read(self.path_list[idx])
         # return self.data[idx]
         
-    def read(self, filename, args):
-        if args.model == 'mxfold2':
+    def read(self, filename):
+        if self.model == 'mxfold2':
             with open(filename) as f:
                 pairs = [0]
                 s = ['']
@@ -59,7 +59,7 @@ class NovaDataset(Dataset):
             seq = ''.join(s)
             return (seq, torch.tensor(pairs))
             # return (filename, seq, torch.tensor(pairs))
-        elif args.model == 'e2efold':
+        elif self.model == 'e2efold':
             with open(filename) as f:
                 pairs = [0]
                 s = ['']
@@ -104,7 +104,7 @@ class NovaDataset(Dataset):
             # return ((PE_batch.squeeze(0), seq_embedding_batch.squeeze(0), state_pad.squeeze(0), contact_masks.squeeze(0)), contacts_batch)
             return (contact, data_seq, matrix_rep, data_len)
         else:
-            raise NotImplementedError(f'NovaDataset::read(): Unimplemented Model {args.model}')
+            raise NotImplementedError(f'NovaDataset::read(): Unimplemented Model {self.model}')
 
 def collate_fn_e2e(data):
     contacts = []
