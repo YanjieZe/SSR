@@ -247,6 +247,8 @@ class NeuralNet(nn.Module):
                 num_filters=num_filters, filter_size=filter_size, pool_size=pool_size, dilation=dilation, num_att=num_att,
                 num_lstm_layers=num_lstm_layers, num_lstm_units=num_lstm_units, dropout_rate=dropout_rate)
         else:
+            # n_in = 4, n_head =8,
+            # n_hidden=2048, n_layer=1, dropout=0.0
             self.encoder = TransformerLayer(n_in, n_head=num_transformer_att, 
                             n_hidden=num_transformer_hidden_units, 
                             n_layers=num_transformer_layers, dropout=dropout_rate)

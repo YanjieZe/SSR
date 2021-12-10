@@ -1,7 +1,9 @@
 archivell/
 archiveII/
 novafold/models/mxfold2/src/build/
+novafold/models/mxfold2/src/
 
+wandb/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

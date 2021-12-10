@@ -8,7 +8,12 @@ from torch.nn import TransformerEncoder, TransformerEncoderLayer
 class TransformerLayer(nn.Module):
     def __init__(self, n_in, n_head, n_hidden, n_layers, dropout=0.5):
         super(TransformerLayer, self).__init__()
+
         self.pos_encoder = PositionalEncoding(n_in, dropout, max_len=1000)
+        # n_head=8
+        # dmodel = n_head * head_dim = 4
+        # so head_dim = ?
+
         encoder_layers = TransformerEncoderLayer(n_in, n_head, n_hidden, dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, n_layers, nn.LayerNorm(n_in))
         self.n_in = self.n_out = n_in
