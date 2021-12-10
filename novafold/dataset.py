@@ -6,7 +6,6 @@ import random
 import utils
 from torch.utils.data import Dataset
 from itertools import groupby
-# import pdb
 
 class NovaDataset(Dataset):
     def __init__(self, args):
@@ -57,7 +56,9 @@ class NovaDataset(Dataset):
                         else:
                             raise RuntimeError('invalid format: {}'.format(filename))
             seq = ''.join(s)
-            return (seq, torch.tensor(pairs))
+            # print(len(seq))
+            # print(torch.tensor(pairs).shape)
+            return seq, torch.tensor(pairs)
             # return (filename, seq, torch.tensor(pairs))
         elif self.model == 'e2efold':
             with open(filename) as f:

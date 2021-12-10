@@ -92,7 +92,10 @@ def parse_args(args=None):
     parser.add_argument('--pair-join', choices=('cat', 'add', 'mul', 'bilinear'), default='cat', 
                         help="how pairs of vectors are joined ('cat', 'add', 'mul', 'bilinear') (default: 'cat')")
     parser.add_argument('--no-split-lr', default=False, action='store_true')
-        
+    
+
+   
+    
     args = parser.parse_args(args)
     
     return args

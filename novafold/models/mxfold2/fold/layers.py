@@ -223,7 +223,7 @@ class LengthLayer(nn.Module):
         return x.reshape((self.n_in,) if isinstance(self.n_in, int) else self.n_in)
 
 
-class NeuralNet(nn.Module):
+class NeuralNet(nn.Module): 
     def __init__(self, embed_size=0,
             num_filters=(96,), filter_size=(5,), dilation=0, pool_size=(1,), 
             num_lstm_layers=0, num_lstm_units=0, num_att=0, 
@@ -241,16 +241,20 @@ class NeuralNet(nn.Module):
         self.embedding = OneHotEmbedding() if embed_size == 0 else SparseEmbedding(embed_size)
         n_in = self.embedding.n_out
 
+        #TODO: here, we can select LSTM or Transformer
         if num_transformer_layers==0:
             self.encoder = CNNLSTMEncoder(n_in,
                 num_filters=num_filters, filter_size=filter_size, pool_size=pool_size, dilation=dilation, num_att=num_att,
                 num_lstm_layers=num_lstm_layers, num_lstm_units=num_lstm_units, dropout_rate=dropout_rate)
         else:
+            # n_in = 4, n_head =8,
+            # n_hidden=2048, n_layer=1, dropout=0.0
             self.encoder = TransformerLayer(n_in, n_head=num_transformer_att, 
                             n_hidden=num_transformer_hidden_units, 
                             n_layers=num_transformer_layers, dropout=dropout_rate)
         n_in = self.encoder.n_out
 
+        
         if self.pair_join != 'bilinear':
             self.transform2d = Transform2D(join=pair_join)
 

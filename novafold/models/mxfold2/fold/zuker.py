@@ -33,7 +33,7 @@ class ZukerFold(AbstractFold):
         self.net = NeuralNet(**kwargs, 
             n_out_paired_layers=n_out_paired_layers,
             n_out_unpaired_layers=n_out_unpaired_layers,
-            exclude_diag=exclude_diag)
+            exclude_diag=exclude_diag) # TODO: here, the neural nets are constructed.
 
         self.fc_length = nn.ModuleDict({
             'score_hairpin_length': LengthLayer(31),
