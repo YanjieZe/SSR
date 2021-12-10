@@ -23,7 +23,15 @@ class NovaDataset(Dataset):
                     l = l.rstrip('\n').split()
                     if len(l)==1:
                         # self.data.append(self.read(l[0], args))
-                        self.path_list.append(l[0])
+                        count = 0
+                        with open(os.path.join(l[0])) as seqfile:
+                            for index, line in enumerate(seqfile):
+                                count += 1
+                        # print(count)
+                        if count <= args.seq_max_len:
+                            self.path_list.append(l[0])
+                        else:
+                            print(f"length of file {l[0]} is {count}, exceeding {args.seq_max_len}")
                     elif len(l)==2:
                         raise NotImplementedError("Original: read_pdb() in mxfold2. Not implemented here.")
         # print(f'Dataset size: {len(self.data)}')
