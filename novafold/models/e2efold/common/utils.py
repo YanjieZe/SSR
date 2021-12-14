@@ -328,6 +328,7 @@ def evaluate_exact(pred_a, true_a):
     true_p = true_a.sum()
     fp = pred_p - tp
     fn = true_p - tp
+    #? True Positive, True Negative, False Positive, False Negative
     recall = tp/(tp+fn)
     precision = tp/(tp+fp)
     f1_score = 2*tp/(2*tp + fp + fn)

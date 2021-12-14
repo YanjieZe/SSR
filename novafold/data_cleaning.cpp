@@ -94,6 +94,34 @@ pair<vector<size_t>, vector<char>> readBPSEQ(const string& path) {
 }
 
 /**
+ * @brief check the validity sequences with pseudoknot
+ * 
+ * @param pair vector<size_t> Pairing information of a certain sequence.
+ *             pair[i] == j iff i-th nt pairs with j-th nt
+ *             pair[i] == 0 iff i-th nt is left alone
+ *             !! pair[0] is meaningless
+ * @param seq vector<char> Characters of the sequence, seq.size() == pair.size()
+ *            !! seq[0] is meaningless
+ * @exception runtime_error The input sequence is invalid.
+ */
+void validityCheck(const vector<size_t>& pair, const vector<char>& seq) {
+    for (size_t i = 1; i < pair.size(); ++i) {
+        if (pair[i]) {
+            if (pair[i] < 0)
+                throw runtime_error("Invalid pair: pair[i] < 0: " + to_string(i) + " " + to_string(pair[i]));
+            if (pair[i] != 0 && pair[i] <= i) {
+                if (i - pair[i] < RNA_GLOBAL_SETTING::LOOP_MINDIST)
+                    throw runtime_error("Sharp loop detected: " + to_string(i) + " " + to_string(pair[i]) + " " + to_string(i - pair[i]));
+                if (pair[pair[i]] != i)
+                    throw runtime_error("pair[pair[i]] != i, maybe not a matching: " + to_string(i) + " " + to_string(pair[i]));
+                if (RNA_GLOBAL_SETTING::VALID_PAIR.find({seq[i], seq[pair[i]]}) == RNA_GLOBAL_SETTING::VALID_PAIR.end())
+                    throw runtime_error("Invalid nt combination detected: " + to_string(i) + " " + to_string(pair[i]) + " " + seq[i] + '-' + seq[pair[i]]);
+            }
+        }
+    }
+}
+
+/**
  * @brief Predicate of whether pseudoknot exists in the input sequence
  *        and check the validity of it
  * 
@@ -120,6 +148,7 @@ bool pseudoknotExists(const vector<size_t>& pair, const vector<char>& seq) {
                     else if (pair[i] == pair[s.top()]) {
                         throw runtime_error("pair[i] == pair[s.top()");
                     } else {
+                        validityCheck(pair, seq);
                         cout << s.top() << '\t' << i << '\t';
                         return true;    // s.top(), i, pair[s.top], pair[i],
                     }
@@ -139,17 +168,39 @@ bool pseudoknotExists(const vector<size_t>& pair, const vector<char>& seq) {
 }
 
 /**
- * @brief Read some BPSEQ lists and check if pseudoknot exists in each of their entries
+ * @brief Read some BPSEQ lists and check if pseudoknot exists in each of their entries.
+ *        Then divide these data into train/val datasets with regard to validity and pseudoknot.
  * 
  * @param listPaths vector<string>, the paths of the list files to be checked
  */
 void checkLists(const vector<string>& listPaths) {
     size_t total_cnt = 0, valid_cnt = 0, pn_cnt = 0, invalid_cnt = 0;
+    ofstream out_valid_train("valid_train.lst", ofstream::out | ofstream::trunc);
+    ofstream out_valid_test("valid_test.lst", ofstream::out | ofstream::trunc);
+    ofstream out_pseudoknot_train("pseudoknot_train.lst", ofstream::out | ofstream::trunc);
+    ofstream out_pseudoknot_test("pseudoknot_test.lst", ofstream::out | ofstream::trunc);
+    ofstream out_invalid("invalid.lst", ofstream::out | ofstream::trunc);
+
+    if (!out_valid_train.good())
+        throw runtime_error("Unable to create output file: valid_train.lst" );
+    if (!out_valid_test.good())
+        throw runtime_error("Unable to create output file: valid_test.lst" );
+    if (!out_pseudoknot_train.good())
+        throw runtime_error("Unable to create output file: pseudoknot_train.lst" );
+    if (!out_pseudoknot_test.good())
+        throw runtime_error("Unable to create output file: pseudoknot_test.lst" );
+    if (!out_invalid.good())
+        throw runtime_error("Unable to create output file: invalid.lst" );
 
     for (const auto& listPath : listPaths) {
-        cout << "-----Checking " << listPath << "-----" << endl;
+        vector<string> valids, pseudoknots;
         ifstream in(listPath);
         string path;
+
+        if (!in.good()) {
+            throw runtime_error("Unable to open input file: " + listPath);
+        }
+        cout << "-----Checking " << listPath << "-----" << endl;
 
         while (getline(in, path)) {
             try {
@@ -158,17 +209,43 @@ void checkLists(const vector<string>& listPaths) {
                 if (pseudoknotExists(r.first, r.second)) {
                     cout << path << endl;
                     ++pn_cnt;
+                    pseudoknots.emplace_back(move(path));
                 } else {
                     ++valid_cnt;
+                    valids.emplace_back(move(path));
                 }
             } catch(const exception& e) {
                 cout << path << ' ' << e.what() << endl;
                 ++invalid_cnt;
+                out_invalid << path << endl;
             }
+        }
+
+        random_shuffle(valids.begin(), valids.end());
+        random_shuffle(pseudoknots.begin(), pseudoknots.end());
+
+        size_t valids_partition = valids.size()*39/40, pseudoknots_partition = pseudoknots.size()*4/5;
+
+        for (size_t i = 0; i < valids_partition; ++i) {
+            out_valid_train << valids[i] << endl;
+        }
+        for (size_t i = valids_partition; i < valids.size(); ++i) {
+            out_valid_test << valids[i] << endl;
+        }
+        for (size_t i = 0; i < pseudoknots_partition; ++i) {
+            out_pseudoknot_train << pseudoknots[i] << endl;
+        }
+        for (size_t i = pseudoknots_partition; i < pseudoknots.size(); ++i) {
+            out_pseudoknot_test << pseudoknots[i] << endl;
         }
 
         in.close();
     }
+    out_valid_train.close();
+    out_valid_test.close();
+    out_pseudoknot_train.close();
+    out_pseudoknot_test.close();
+    out_invalid.close();
 
-    cout << total_cnt << " sequences checked in total, " << valid_cnt << " valid, " << pn_cnt << " pseudoknots, " << invalid_cnt << " invalid" << endl;
+    clog << total_cnt << " sequences checked in total, " << valid_cnt << " valid, " << pn_cnt << " pseudoknots, " << invalid_cnt << " invalid" << endl;
 }

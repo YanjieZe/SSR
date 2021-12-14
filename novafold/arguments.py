@@ -20,7 +20,7 @@ def parse_args(args=None):
     parser.add_argument('--exp', default='', type=str)
     parser.add_argument('--log-dir', default='./exp/', type=str)
     parser.add_argument('--data-root', default='./data/', type=str)
-    parser.add_argument('--train-set', default='TestSetA.lst,TestSetB.lst', type=str)
+    parser.add_argument('--train-set', default='valid_train.lst', type=str)
     
     # Currently, regularization only works on mxfold2.
     parser.add_argument('--l1-weight', type=float, default=0.,

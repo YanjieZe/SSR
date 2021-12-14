@@ -14,8 +14,8 @@ class NovaDataset(Dataset):
         self.path_list = []
         self.model = args.model
         # self.data = []
-        train_set = args.train_set.split(',')
-        for lst in train_set:
+        dataset = args.train_set.split(',')
+        for lst in dataset:
             path = os.path.join(args.data_root, lst)
             print(f'Reading data from {path}')
             with open(os.path.join(path)) as f:
