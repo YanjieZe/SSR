@@ -47,8 +47,7 @@ def benchmark(args):
             model.load_state_dict(torch.load(save_path, map_location=torch.device('gpu')))
         model.eval()
     else:
-        pass
-        # model = lambda x, y_gt: pass
+        import models.linearfold as model
     
     print("Benchmarking on pseudoknot-free data...")
     p_sum = 0
@@ -80,12 +79,7 @@ def benchmark(args):
         loop.set_description(f'{args.model}, with-pseudoknots: \
                              Avg. PPV {p_sum/idx} | Avg. SEN {r_sum/idx} | Avg. F1 {f1_sum/idx}')
         
-if __name__ == '__main__':
-    args = parse_args()
-    print(args)
-    benchmark(args)
-    
-    #! todo: e2efold rewrite
+            #! todo: e2efold rewrite
 def evaluate(model, args, x, y):
     if (args.model == 'e2efold'):
         (PE_batch, seq_embedding_batch, state_pad, contact_masks) = x
@@ -99,7 +93,8 @@ def evaluate(model, args, x, y):
         return ps, rs, f1s
     
     elif (args.model == 'mxfold2'):
-        (seqs, pairs) = x
+        seqs = x
+        pairs = y
         scs, preds, bps = model(seqs)
         result_tuple_list = list(map(lambda i: evaluate_mx2(pairs[i], 
         bps[i]), range(len(bps))))
@@ -107,8 +102,20 @@ def evaluate(model, args, x, y):
         return ps, rs, f1s
     
     elif (args.model == 'linearfold'):
-        return 0
-
+        seqs = x
+        pairs = y
+        bps = []
+        for seq in seqs:
+            bp = model.predict(seqs[0])
+            bps.append(bp)
+        assert (bps[0].shape == pairs[0].shape), f"{bps[0].shape}, {pairs[0].shape}"
+        # print("seqs[0]", seqs[0])
+        # print("bps[0]", bps[0])
+        # print("pairs[0]", pairs[0].numpy())
+        result_tuple_list = list(map(lambda i: evaluate_mx2(pairs[i], 
+        bps[i]), range(len(bps))))
+        ps, rs, f1s = zip(*result_tuple_list)
+        return ps, rs, f1s
 
 def evaluate_e2e(pred_a, true_a):
     tp_map = torch.sign(torch.Tensor(pred_a)*torch.Tensor(true_a))
@@ -119,9 +126,9 @@ def evaluate_e2e(pred_a, true_a):
     fn = true_p - tp
     #? True Positive, True Negative, False Positive, False Negative
     
-    p = tp / (tp + fp)          #* Precision / PPV
-    r = tp / (tp + fn)          #* Recall / TPR / Sensitivity
-    f1 = 2 * p * r / (p + r)    #* F1
+    p = tp / (tp + fp + 1e-9)          #* Precision / PPV
+    r = tp / (tp + fn + 1e-9)          #* Recall / TPR / Sensitivity
+    f1 = 2 * p * r / (p + r + 1e-9)    #* F1
     
     return p, r, f1
 
@@ -153,8 +160,15 @@ def evaluate_mx2(ref, pred):
     tn = L * (L - 1) // 2 - tp - fp - fn
     #? True Positive, True Negative, False Positive, False Negative
     
-    p = tp / (tp + fp)          #* Precision / PPV
-    r = tp / (tp + fn)          #* Recall / TPR / Sensitivity
-    f1 = 2 * p * r / (p + r)    #* F1
+    p = tp / (tp + fp + 1e-9)          #* Precision / PPV
+    r = tp / (tp + fn + 1e-9)          #* Recall / TPR / Sensitivity
+    f1 = 2 * p * r / (p + r + 1e-9)    #* F1
     
     return p, r, f1
+        
+if __name__ == '__main__':
+    args = parse_args()
+    print(args)
+    benchmark(args)
+    
+

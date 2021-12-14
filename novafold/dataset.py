@@ -45,7 +45,7 @@ class NovaDataset(Dataset):
         # return self.data[idx]
         
     def read(self, filename):
-        if self.model == 'mxfold2':
+        if self.model == 'mxfold2' or self.model == 'linearfold':
             with open(filename) as f:
                 pairs = [0]
                 s = ['']
@@ -149,4 +149,4 @@ def collate_fn_e2e(data):
     
     return ((PE_batch, seq_embedding_batch, state_pad, contact_masks), contacts_batch)
 
-collate_fn_map = {'e2efold' : collate_fn_e2e, 'mxfold2' : None}
+collate_fn_map = {'e2efold' : collate_fn_e2e, 'mxfold2' : None, 'linearfold' : None}

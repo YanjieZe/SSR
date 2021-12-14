@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC  -flto -shared  -o pylinearfold.cpython-37m-x86_64-linux-gnu.so CMakeFiles/pylinearfold.dir/interface.cpp.o 
