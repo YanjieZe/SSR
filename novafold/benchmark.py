@@ -44,7 +44,10 @@ def benchmark(args):
         if (not torch.cuda.is_available()) or args.device == 'cpu':
             model.load_state_dict(torch.load(save_path, map_location=torch.device('cpu')))
         else:
-            model.load_state_dict(torch.load(save_path, map_location=torch.device('gpu')))
+            try:
+                model.load_state_dict(torch.load(save_path, map_location=torch.device('gpu')))
+            except:
+                print("Model loading fails. Use the initial model.")
         model.eval()
     else:
         import models.linearfold as model

@@ -71,8 +71,8 @@ def train(args):
             
             loop.set_description(f'Epoch [{e}/{args.epoch}], Iter [{idx}/{len(loop)}]')
             loop.set_postfix(loss = loss.item())
-            
         utils.save_model(model, e, args)
+
 
 if __name__ == '__main__':
     args = parse_args()

@@ -103,7 +103,12 @@ def build_model(args):
 
 
 def save_model(model, epoch, args):
-    save_path = os.path.join(args.log_dir, args.model+'_'+args.exp, str(epoch)+'.pth')
+    save_dir = os.path.join(args.log_dir, args.model+'_'+args.exp)
+    if( not os.path.exists(args.log_dir) ):
+        os.mkdir(args.log_dir)
+    if( not os.path.exists(save_dir) ):
+        os.mkdir(save_dir)
+    save_path = os.path.join(save_dir,  str(epoch)+'.pth')
     torch.save(model.state_dict(), save_path)
 
 

@@ -27,6 +27,8 @@ def parse_args(args=None):
                         help='the weight for L1 regularization (default: 0)')
     parser.add_argument('--l2-weight', type=float, default=0.,
                         help='the weight for L2 regularization (default: 0)')
+    parser.add_argument('--score-loss-weight', type=float, default=1.,
+                          help='the weight for score loss for hinge_mix loss (default: 1)')
     # predict
     parser.add_argument('--predict_epoch', default=0, type=int)
     
