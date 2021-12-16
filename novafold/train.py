@@ -62,7 +62,6 @@ def train(args):
     model.train()
     print("Start training...")
 
-    count_niter = 0
 
     for e in range(args.epoch):
         loop = tqdm(train_loader)
@@ -72,7 +71,7 @@ def train(args):
             # y_gt = torch.from_numpy(y_gt).to(device)
             
             loss = compute_loss(x, y_gt)
-            writer.add_scalars('Train_loss_' + now, {"Train_loss": float(loss)}, count_niter)
+            writer.add_scalars('Train_loss_' + now, {"Train_loss": float(loss)}, e)
             
             optimizer.zero_grad()
             # loss.register_hook(lambda grad: print(grad))
@@ -85,7 +84,7 @@ def train(args):
             
             loop.set_description(f'Epoch [{e}/{args.epoch}], Iter [{idx}/{len(loop)}]')
             loop.set_postfix(loss = loss.item())
-            count_niter =  count_niter  + 1
+            
         utils.save_model(model, e, args)
 
 

@@ -40,6 +40,7 @@ def benchmark(args):
     
     if (args.model != 'linearfold'):
         #! Please manually set this path!
+<<<<<<< HEAD
         # save_path = os.path.join(args.log_dir, args.model+'_'+args.exp, str(args.epoch)+'.pth')
         model = utils.build_model(args).to(device).float()
         # if (not torch.cuda.is_available()) or args.device == 'cpu':
@@ -50,6 +51,17 @@ def benchmark(args):
         #     except:
         #         print("Model loading fails. Use the initial model.")
         # model.eval()
+=======
+        save_path = os.path.join(args.log_dir, args.model+'_'+args.exp, str(args.epoch)+'.pth')
+        model = utils.build_model(args)
+        if (not torch.cuda.is_available()) or args.device == 'cpu':
+            model.load_state_dict(torch.load(save_path, map_location=torch.device('cpu')))
+        else:
+            try:
+                model.load_state_dict(torch.load(save_path, map_location=torch.device('gpu')))
+            except:
+                print("Model loading fails. Use the initial model.")
+>>>>>>> d5c1aa8a2111daf7721f717ac541876fe92bb2ac
         model.eval()
     else:
         import models.linearfold as model
