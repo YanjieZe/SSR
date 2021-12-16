@@ -15,7 +15,7 @@ def parse_args(args=None):
     # train
     parser.add_argument('--lr', default=1e-3, type=float)
     parser.add_argument('--epoch', default=20, type=int)
-    parser.add_argument('--batch-size', default=4, type=int)
+    parser.add_argument('--batch-size', default=16, type=int)
     parser.add_argument('--num-workers', default=0, type=int)
     parser.add_argument('--exp', default='', type=str)
     parser.add_argument('--log-dir', default='./exp/', type=str)
@@ -27,6 +27,8 @@ def parse_args(args=None):
                         help='the weight for L1 regularization (default: 0)')
     parser.add_argument('--l2-weight', type=float, default=0.,
                         help='the weight for L2 regularization (default: 0)')
+    parser.add_argument('--score-loss-weight', type=float, default=1.,
+                          help='the weight for score loss for hinge_mix loss (default: 1)')
     # predict
     parser.add_argument('--predict_epoch', default=0, type=int)
     
@@ -42,6 +44,14 @@ def parse_args(args=None):
     # e2efold    
     parser.add_argument('--seq-max-len', default=600, type=int)
     parser.add_argument('--u-net-d', default=10, type=int)
+    parser.add_argument('--pp-steps', default=20, type=int)
+    parser.add_argument('--pp-loss', default='f1', type=str)
+    parser.add_argument('--step-gamma', default=1, type=int)
+    parser.add_argument('--k', default=1, type=int)
+    parser.add_argument('--rho-per-position', default='matrix', type=str)
+    parser.add_argument('--pp-model', default='mixed', type=str)
+    parser.add_argument('--e2e-load', default="", type=str)
+
     
     # mxfold2
     parser.add_argument('--loss-func', choices=('hinge', 'hinge_mix'), default='hinge',

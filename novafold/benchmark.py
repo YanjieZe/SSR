@@ -11,6 +11,7 @@ from arguments import parse_args
 from loss import Loss
 import os
 
+@torch.no_grad()
 def benchmark(args):
     device = torch.device('cuda:0' if args.device == 'gpu' and torch.cuda.is_available() else 'cpu')
     print(f'device: {device}, CUDA Available: {torch.cuda.is_available()}')
@@ -23,7 +24,7 @@ def benchmark(args):
                                    num_workers=args.num_workers,
                                    pin_memory=True,
                                    drop_last=True,
-                                   collate_fn=dataset.collate_fn_map[args.model]
+                                   collate_fn=dataset.collate_fn_map[args.model],
                                    )
     
     args.train_set = "pseudoknot_test.lst"
@@ -34,17 +35,21 @@ def benchmark(args):
                                    num_workers=args.num_workers,
                                    pin_memory=True,
                                    drop_last=True,
-                                   collate_fn=dataset.collate_fn_map[args.model]
+                                   collate_fn=dataset.collate_fn_map[args.model],
                                    )
     
     if (args.model != 'linearfold'):
         #! Please manually set this path!
-        save_path = os.path.join(args.log_dir, args.model+'_'+args.exp, str(args.epoch)+'.pth')
-        model = utils.build_model(args)
-        if (not torch.cuda.is_available()) or args.device == 'cpu':
-            model.load_state_dict(torch.load(save_path, map_location=torch.device('cpu')))
-        else:
-            model.load_state_dict(torch.load(save_path, map_location=torch.device('gpu')))
+        # save_path = os.path.join(args.log_dir, args.model+'_'+args.exp, str(args.epoch)+'.pth')
+        model = utils.build_model(args).to(device).float()
+        # if (not torch.cuda.is_available()) or args.device == 'cpu':
+        #     model.load_state_dict(torch.load(save_path, map_location=torch.device('cpu')))
+        # else:
+        #     try:
+        #         model.load_state_dict(torch.load(save_path, map_location=torch.device('gpu')))
+        #     except:
+        #         print("Model loading fails. Use the initial model.")
+        # model.eval()
         model.eval()
     else:
         import models.linearfold as model
@@ -56,13 +61,16 @@ def benchmark(args):
 
     loop = tqdm(valid_test_loader)
     for idx, (x, y_gt) in enumerate(loop):
+        
+        x = [x_i.to(device) for x_i in x ]
+        y_gt = [y_i.to(device) for y_i in y_gt]
         ps, rs, f1s = evaluate(model, args, x, y_gt)
-        p_sum += np.sum(ps)
-        r_sum += np.sum(rs)
-        f1_sum += np.sum(f1s)
+        p_sum += np.average(ps)
+        r_sum += np.average(rs)
+        f1_sum += np.average(f1s)
         
         loop.set_description(f'{args.model}, pseudoknot-free: \
-                             Avg. PPV {p_sum/idx} | Avg. SEN {r_sum/idx} | Avg. F1 {f1_sum/idx}')
+                             Avg. PPV {p_sum/(idx+1)} | Avg. SEN {r_sum/(idx+1)} | Avg. F1 {f1_sum/(idx+1)}')
     
     print("Benchmarking on data with pseudoknots...")
     p_sum = 0
@@ -71,13 +79,16 @@ def benchmark(args):
     
     loop = tqdm(pseudoknot_test_loader)
     for idx, (x, y_gt) in enumerate(loop):
+        x = [x_i.to(device) for x_i in x ]
+        y_gt = [y_i.to(device) for y_i in y_gt]
+
         ps, rs, f1s = evaluate(model, args, x, y_gt)
-        p_sum += np.sum(ps)
-        r_sum += np.sum(rs)
-        f1_sum += np.sum(f1s)
+        p_sum += np.average(ps)
+        r_sum += np.average(rs)
+        f1_sum += np.average(f1s)
         
         loop.set_description(f'{args.model}, with-pseudoknots: \
-                             Avg. PPV {p_sum/idx} | Avg. SEN {r_sum/idx} | Avg. F1 {f1_sum/idx}')
+                             Avg. PPV {p_sum/(idx+1)} | Avg. SEN {r_sum/(idx+1)} | Avg. F1 {f1_sum/(idx+1)}')
         
             #! todo: e2efold rewrite
 def evaluate(model, args, x, y):
@@ -86,8 +97,9 @@ def evaluate(model, args, x, y):
         contacts_batch = y
         pred_contacts = model(PE_batch, seq_embedding_batch, state_pad)
         
-        result_tuple_list = list(map(lambda i: evaluate_e2e(pred_contacts.cpu()[i], 
-        contacts_batch.cpu()[i]), range(contacts_batch.shape[0])))
+        # import pdb; pdb.set_trace()
+        result_tuple_list = list(map(lambda i: evaluate_e2e(pred_contacts[1][-1][i].cpu(), 
+        contacts_batch[i].cpu()), range(len(contacts_batch))))
         
         ps, rs, f1s = zip(*result_tuple_list)
         return ps, rs, f1s
@@ -118,6 +130,8 @@ def evaluate(model, args, x, y):
         return ps, rs, f1s
 
 def evaluate_e2e(pred_a, true_a):
+    # print(pred_a)
+    # print(true_a)
     tp_map = torch.sign(torch.Tensor(pred_a)*torch.Tensor(true_a))
     tp = tp_map.sum()   #* true positive
     pred_p = torch.sign(torch.Tensor(pred_a)).sum() #* predicted positive (TP + FP)
@@ -129,7 +143,7 @@ def evaluate_e2e(pred_a, true_a):
     p = tp / (tp + fp + 1e-9)          #* Precision / PPV
     r = tp / (tp + fn + 1e-9)          #* Recall / TPR / Sensitivity
     f1 = 2 * p * r / (p + r + 1e-9)    #* F1
-    
+    # print(p, r, f1)
     return p, r, f1
 
 

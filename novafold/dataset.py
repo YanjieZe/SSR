@@ -3,6 +3,8 @@ import math
 import numpy as np
 import os
 import random
+
+from torch._C import device
 import utils
 from torch.utils.data import Dataset
 from itertools import groupby
@@ -15,6 +17,7 @@ class NovaDataset(Dataset):
         self.model = args.model
         # self.data = []
         dataset = args.train_set.split(',')
+        
         for lst in dataset:
             path = os.path.join(args.data_root, lst)
             print(f'Reading data from {path}')
@@ -70,7 +73,7 @@ class NovaDataset(Dataset):
             # return (filename, seq, torch.tensor(pairs))
         elif self.model == 'e2efold':
             with open(filename) as f:
-                pairs = [0]
+                pairs = []
                 s = ['']
                 for l in f:
                     if not l.startswith('#'):

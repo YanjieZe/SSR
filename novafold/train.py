@@ -2,6 +2,7 @@ from random import randint
 import torch
 import torch.utils.data as data
 import torch.optim as optim
+import torch.nn as nn
 import numpy as np
 import utils
 import dataset
@@ -9,10 +10,18 @@ import time
 from tqdm import tqdm
 from arguments import parse_args
 from loss import Loss
+from tensorboardX import SummaryWriter
+import time
+
 try:
     import wandb
 except:
 	print('Wandb is not installed in your env. Skip `import wandb`.')
+
+### activate tensorboard
+writer = SummaryWriter('./logs')
+now = time.asctime().replace(" ", "_")
+now = now.replace(":","_")
 
 def train(args):
     if args.wandb:
@@ -48,22 +57,27 @@ def train(args):
     except:
         optimizer = optim.Adam(params=model.parameters(), lr=args.lr)
         
-        
+    
     
     model.train()
     print("Start training...")
-    
+
+    count_niter = 0
+
     for e in range(args.epoch):
         loop = tqdm(train_loader)
         for idx, (x, y_gt) in enumerate(loop):
         # for idx, (x, y_gt) in enumerate(train_loader):
-            # x = x.to(device)
-            # y_gt = y_gt.to(device)
+            # x = torch.from_numpy(x).to(device)
+            # y_gt = torch.from_numpy(y_gt).to(device)
             
             loss = compute_loss(x, y_gt)
+            writer.add_scalars('Train_loss_' + now, {"Train_loss": float(loss)}, count_niter)
             
             optimizer.zero_grad()
+            # loss.register_hook(lambda grad: print(grad))
             loss.backward()
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=5, norm_type=2)
             optimizer.step()
             
             if args.wandb:
@@ -71,8 +85,9 @@ def train(args):
             
             loop.set_description(f'Epoch [{e}/{args.epoch}], Iter [{idx}/{len(loop)}]')
             loop.set_postfix(loss = loss.item())
-            
+            count_niter =  count_niter  + 1
         utils.save_model(model, e, args)
+
 
 if __name__ == '__main__':
     args = parse_args()

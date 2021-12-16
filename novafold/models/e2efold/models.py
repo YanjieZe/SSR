@@ -253,6 +253,7 @@ class ContactAttention_simple_fix_PE(ContactAttention_simple):
         seq: L*4
         state: L*L
         """
+
         position_embeds = self.PE_net(pe.view(-1, 111)).view(-1, self.L, self.d) # N*L*111 -> N*L*d
         position_embeds = position_embeds.permute(0, 2, 1) # N*d*L
         seq = seq.permute(0, 2, 1) # 4*L

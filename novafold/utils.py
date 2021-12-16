@@ -3,16 +3,19 @@ import numpy as np
 import os
 import random
 import math
+import torch.nn.functional as F
+import torch.nn as nn
 
 # e2efold
 from models.e2efold.models import ContactNetwork, ContactNetwork_test, ContactNetwork_fc
 from models.e2efold.models import ContactAttention, ContactAttention_simple_fix_PE
+from models.e2efold.models import Lag_PP_NN, RNA_SS_e2e, Lag_PP_zero, Lag_PP_perturb, Lag_PP_mixed
 from models.e2efold.models import ContactAttention_simple
 
 # mxfold2
-from models.mxfold2.fold.mix import MixedFold
-from models.mxfold2.fold.rnafold import RNAFold
-from models.mxfold2.fold.zuker import ZukerFold
+# from models.mxfold2.fold.mix import MixedFold
+# from models.mxfold2.fold.rnafold import RNAFold
+# from models.mxfold2.fold.zuker import ZukerFold
 
 def set_seed(seed):
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -22,10 +25,10 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
     random.seed(seed)
     np.random.seed(seed)
-    try:
-        torch.use_deterministic_algorithms(True)
-    except:
-        pass
+    # try:
+    #     torch.use_deterministic_algorithms(True)
+    # except:
+    #     pass
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
@@ -85,25 +88,55 @@ def build_model(args):
         seq_len = args.seq_max_len
         print("mxlen", args.seq_max_len)
         if args.model_type =='test_lc':
-            return ContactNetwork_test(d=d, L=seq_len)
-        if args.model_type == 'att6':
-            return ContactAttention(d=d, L=seq_len)
-        if args.model_type == 'att_simple':
-            return ContactAttention_simple(d=d, L=seq_len)    
-        if args.model_type is None or args.model_type == 'att_simple_fix':
-            return ContactAttention_simple_fix_PE(d=d, L=seq_len)
-        if args.model_type == 'fc':
-            return ContactNetwork_fc(d=d, L=seq_len)
-        if args.model_type == 'conv2d_fc':
-            return ContactNetwork(d=d, L=seq_len)
+            contact_net =  ContactNetwork_test(d=d, L=seq_len)
+        elif args.model_type == 'att6':
+            contact_net =  ContactAttention(d=d, L=seq_len)
+        elif args.model_type == 'att_simple':
+            contact_net =  ContactAttention_simple(d=d, L=seq_len)    
+        elif args.model_type is None or args.model_type == 'att_simple_fix':
+            contact_net =  ContactAttention_simple_fix_PE(d=d, L=seq_len)
+        elif args.model_type == 'fc':
+            contact_net = ContactNetwork_fc(d=d, L=seq_len)
+        elif args.model_type == 'conv2d_fc':
+            contact_net =  ContactNetwork(d=d, L=seq_len)
         else:
             raise NotImplementedError(f'e2efold-{args.model_type} is not yet implemented.')
+
+        pp_steps = args.pp_steps
+        k = args.k
+        rho_per_position = args.rho_per_position
+        pp_type = '{}_s{}'.format(args.pp_model, pp_steps)
+        if pp_type=='nn':
+            lag_pp_net = Lag_PP_NN(pp_steps, k)
+        elif 'zero' in pp_type:
+            lag_pp_net = Lag_PP_zero(pp_steps, k)
+        elif 'perturb' in pp_type:
+            lag_pp_net = Lag_PP_perturb(pp_steps, k)
+        elif 'mixed'in pp_type:
+            lag_pp_net = Lag_PP_mixed(pp_steps, k, rho_per_position)
+        else:
+            raise NotImplementedError(f'e2efold-{pp_type} is not yet implemented.')
+        
+        rna_ss_e2e = RNA_SS_e2e(contact_net, lag_pp_net)
+
+        if args.e2e_load != "":
+            if os.path.isfile(args.e2e_load):
+                print(f'Loading e2e model from {args.e2e_load}')
+                rna_ss_e2e.load_state_dict(torch.load(args.e2e_load), strict = True)
+
+        return rna_ss_e2e 
+        
     else:
         raise NotImplementedError(f'Model {model_name} is not yet implemented.')
 
 
 def save_model(model, epoch, args):
-    save_path = os.path.join(args.log_dir, args.model+'_'+args.exp, str(epoch)+'.pth')
+    save_dir = os.path.join(args.log_dir, args.model+'_'+args.exp)
+    if( not os.path.exists(args.log_dir) ):
+        os.mkdir(args.log_dir)
+    if( not os.path.exists(save_dir) ):
+        os.mkdir(save_dir)
+    save_path = os.path.join(save_dir,  str(epoch)+'.pth')
     torch.save(model.state_dict(), save_path)
 
 
@@ -235,3 +268,29 @@ def contact_map_masks(seq_lens, max_len):
         l = int(seq_lens[i].cpu().numpy())
         masks[i, :l, :l]=1
     return masks
+
+# e2e specific
+
+def f1_loss(pred_a, true_a):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    pred_a  = -(F.relu(-pred_a+1)-1)
+
+    true_a = true_a.unsqueeze(1)
+    unfold = nn.Unfold(kernel_size=(3, 3), padding=1)
+    true_a_tmp = unfold(true_a)
+    w = torch.Tensor([0, 0.0, 0, 0.0, 1, 0.0, 0, 0.0, 0]).to(device)
+    true_a_tmp = true_a_tmp.transpose(1, 2).matmul(w.view(w.size(0), -1)).transpose(1, 2)
+    true_a = true_a_tmp.view(true_a.shape)
+    true_a = true_a.squeeze(1)
+
+    tp = pred_a*true_a
+    tp = torch.sum(tp, (1,2))
+
+    fp = pred_a*(1-true_a)
+    fp = torch.sum(fp, (1,2))
+
+    fn = (1-pred_a)*true_a
+    fn = torch.sum(fn, (1,2))
+
+    f1 = torch.div(2*tp, (2*tp + fp + fn))
+    return 1-f1.mean()
