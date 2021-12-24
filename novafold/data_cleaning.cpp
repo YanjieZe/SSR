@@ -16,16 +16,17 @@ void checkLists(const vector<string>&);
 
 int main() {
     checkLists({
-        "data/archiveII.lst",
-        "data/bpRNAnew.nr500.canonicals.lst",
-        "data/RNAStrAlign600-train.lst",
-        "data/TestSetA.lst",
-        "data/TestSetB.lst",
-        "data/TR0-canonicals.lst",
-        "data/TrainSetA.lst",
-        "data/TrainSetB.lst",
-        "data/TS0-canonicals.lst",
-        "data/VL0-canonicals.lst",
+        // "data/archiveII.lst",
+        // "data/bpRNAnew.nr500.canonicals.lst",
+        // "data/RNAStrAlign600-train.lst",
+        // "data/TestSetA.lst",
+        // "data/TestSetB.lst",
+        // "data/TR0-canonicals.lst",
+        // "data/TrainSetA.lst",
+        // "data/TrainSetB.lst",
+        // "data/TS0-canonicals.lst",
+        // "data/VL0-canonicals.lst",
+        "data/finaltest.lst"
     });
 
     return 0;
@@ -175,11 +176,11 @@ bool pseudoknotExists(const vector<size_t>& pair, const vector<char>& seq) {
  */
 void checkLists(const vector<string>& listPaths) {
     size_t total_cnt = 0, valid_cnt = 0, pn_cnt = 0, invalid_cnt = 0;
-    ofstream out_valid_train("valid_train.lst", ofstream::out | ofstream::trunc);
-    ofstream out_valid_test("valid_test.lst", ofstream::out | ofstream::trunc);
-    ofstream out_pseudoknot_train("pseudoknot_train.lst", ofstream::out | ofstream::trunc);
-    ofstream out_pseudoknot_test("pseudoknot_test.lst", ofstream::out | ofstream::trunc);
-    ofstream out_invalid("invalid.lst", ofstream::out | ofstream::trunc);
+    ofstream out_valid_train("finaltest_valid_train.lst", ofstream::out | ofstream::trunc);
+    ofstream out_valid_test("finaltest_valid_test.lst", ofstream::out | ofstream::trunc);
+    ofstream out_pseudoknot_train("finaltest_pseudoknot_train.lst", ofstream::out | ofstream::trunc);
+    ofstream out_pseudoknot_test("finaltest_pseudoknot_test.lst", ofstream::out | ofstream::trunc);
+    ofstream out_invalid("finaltest_invalid.lst", ofstream::out | ofstream::trunc);
 
     if (!out_valid_train.good())
         throw runtime_error("Unable to create output file: valid_train.lst" );

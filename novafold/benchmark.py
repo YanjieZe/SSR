@@ -16,14 +16,25 @@ def benchmark(args):
     device = torch.device('cuda:0' if args.device == 'gpu' and torch.cuda.is_available() else 'cpu')
     print(f'device: {device}, CUDA Available: {torch.cuda.is_available()}')
     
+    args.train_set = "final_test.lst"
+    final_test_dataset = dataset.NovaDataset(args)
+    final_test_loader = data.DataLoader(dataset=final_test_dataset,
+                                   batch_size=args.batch_size,
+                                   shuffle=False,
+                                   num_workers=args.num_workers,
+                                   pin_memory=True,
+                                   drop_last=False,
+                                   collate_fn=dataset.collate_fn_map[args.model],
+                                   )
+    
     args.train_set = "valid_test.lst"
     valid_test_dataset = dataset.NovaDataset(args)
     valid_test_loader = data.DataLoader(dataset=valid_test_dataset,
                                    batch_size=args.batch_size,
-                                   shuffle=True,
+                                   shuffle=False,
                                    num_workers=args.num_workers,
                                    pin_memory=True,
-                                   drop_last=True,
+                                   drop_last=False,
                                    collate_fn=dataset.collate_fn_map[args.model],
                                    )
     
@@ -31,12 +42,24 @@ def benchmark(args):
     pseudoknot_test_dataset = dataset.NovaDataset(args)
     pseudoknot_test_loader = data.DataLoader(dataset=pseudoknot_test_dataset,
                                    batch_size=args.batch_size,
-                                   shuffle=True,
+                                   shuffle=False,
                                    num_workers=args.num_workers,
                                    pin_memory=True,
-                                   drop_last=True,
+                                   drop_last=False,
                                    collate_fn=dataset.collate_fn_map[args.model],
                                    )
+    
+    args.train_set = "archiveII_cleaned.lst"
+    archiveII_clean_test_dataset = dataset.NovaDataset(args)
+    archiveII_clean_test_loader = data.DataLoader(dataset=archiveII_clean_test_dataset,
+                                   batch_size=args.batch_size,
+                                   shuffle=False,
+                                   num_workers=args.num_workers,
+                                   pin_memory=True,
+                                   drop_last=False,
+                                   collate_fn=dataset.collate_fn_map[args.model],
+                                   )
+    
     
     if (args.model != 'linearfold'):
         #! Please manually set this path!
@@ -53,17 +76,33 @@ def benchmark(args):
         model.eval()
     else:
         import models.linearfold as model
-    
+
+    print("Benchmarking on Final Test...")
+    p_sum = 0
+    r_sum = 0
+    f1_sum = 0
+    loop = tqdm(final_test_loader)
+    for idx, (x, y_gt) in enumerate(loop):
+        
+        # x = [x_i.to(device) for x_i in x ]
+        # y_gt = [y_i.to(device) for y_i in y_gt]
+        ps, rs, f1s = evaluate(model, args, x, y_gt)
+        p_sum += np.average(ps)
+        r_sum += np.average(rs)
+        f1_sum += np.average(f1s)
+        
+        loop.set_description(f'{args.model}, pseudoknot-free: \
+                             Avg. PPV {p_sum/(idx+1)} | Avg. SEN {r_sum/(idx+1)} | Avg. F1 {f1_sum/(idx+1)}')
+
     print("Benchmarking on pseudoknot-free data...")
     p_sum = 0
     r_sum = 0
     f1_sum = 0
-
     loop = tqdm(valid_test_loader)
     for idx, (x, y_gt) in enumerate(loop):
         
-        x = [x_i.to(device) for x_i in x ]
-        y_gt = [y_i.to(device) for y_i in y_gt]
+        # x = [x_i.to(device) for x_i in x ]
+        # y_gt = [y_i.to(device) for y_i in y_gt]
         ps, rs, f1s = evaluate(model, args, x, y_gt)
         p_sum += np.average(ps)
         r_sum += np.average(rs)
@@ -76,11 +115,10 @@ def benchmark(args):
     p_sum = 0
     r_sum = 0
     f1_sum = 0
-    
     loop = tqdm(pseudoknot_test_loader)
     for idx, (x, y_gt) in enumerate(loop):
-        x = [x_i.to(device) for x_i in x ]
-        y_gt = [y_i.to(device) for y_i in y_gt]
+        # x = [x_i.to(device) for x_i in x ]
+        # y_gt = [y_i.to(device) for y_i in y_gt]
 
         ps, rs, f1s = evaluate(model, args, x, y_gt)
         p_sum += np.average(ps)
@@ -89,8 +127,25 @@ def benchmark(args):
         
         loop.set_description(f'{args.model}, with-pseudoknots: \
                              Avg. PPV {p_sum/(idx+1)} | Avg. SEN {r_sum/(idx+1)} | Avg. F1 {f1_sum/(idx+1)}')
+    
+    print("Benchmarking on all clean data of archiveII...")
+    p_sum = 0
+    r_sum = 0
+    f1_sum = 0
+    loop = tqdm(archiveII_clean_test_loader)
+    for idx, (x, y_gt) in enumerate(loop):
         
-            #! todo: e2efold rewrite
+        # x = [x_i.to(device) for x_i in x ]
+        # y_gt = [y_i.to(device) for y_i in y_gt]
+        ps, rs, f1s = evaluate(model, args, x, y_gt)
+        p_sum += np.average(ps)
+        r_sum += np.average(rs)
+        f1_sum += np.average(f1s)
+        
+        loop.set_description(f'{args.model}, archiveII_clean: \
+                             Avg. PPV {p_sum/(idx+1)} | Avg. SEN {r_sum/(idx+1)} | Avg. F1 {f1_sum/(idx+1)}')
+        
+
 def evaluate(model, args, x, y):
     if (args.model == 'e2efold'):
         (PE_batch, seq_embedding_batch, state_pad, contact_masks) = x
@@ -98,7 +153,7 @@ def evaluate(model, args, x, y):
         pred_contacts = model(PE_batch, seq_embedding_batch, state_pad)
         
         # import pdb; pdb.set_trace()
-        result_tuple_list = list(map(lambda i: evaluate_e2e(pred_contacts[1][-1][i].cpu(), 
+        result_tuple_list = list(map(lambda i: evaluate_e2e((pred_contacts[1][-1][i].cpu() > 0.5), 
         contacts_batch[i].cpu()), range(len(contacts_batch))))
         
         ps, rs, f1s = zip(*result_tuple_list)

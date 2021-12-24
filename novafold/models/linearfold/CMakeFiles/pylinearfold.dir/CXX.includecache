@@ -527,8 +527,6 @@ utility
 -
 vector
 -
-string_view
--
 
 pybind11/include/pybind11/complex.h
 pybind11.h
@@ -543,6 +541,10 @@ pybind11/include/pybind11/attr.h
 pybind11/include/pybind11/options.h
 
 pybind11/include/pybind11/detail/common.h
+yvals.h
+-
+crtdefs.h
+-
 Python.h
 -
 frameobject.h
@@ -710,6 +712,8 @@ utility
 type_traits
 -
 optional
+-
+string_view
 -
 
 pybind11/include/pybind11/stl.h
