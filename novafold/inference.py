@@ -1,3 +1,7 @@
+# > 
+# UUUAUCCCUCGAAUAUUGAUCGAAUAUGUAUGAAAUAUGAUGGUUAAAUGUUUCAUUCACAUUCGGUCAACGUUCGAGUGAUAAA
+# .(((((.((((((..((((((((((.((.(((((((.............))))))).)).))))))))))..)))))).))))).
+
 from random import randint
 import torch
 import torch.utils.data as data
@@ -14,7 +18,7 @@ import os
 def benchmark(args):
     device = torch.device('cuda:0' if args.device == 'gpu' and torch.cuda.is_available() else 'cpu')
     print(f'device: {device}, CUDA Available: {torch.cuda.is_available()}')
-    
+    args.train_set = "inference_data.lst"
     print("testing on", args.train_set)
     valid_test_dataset = dataset.NovaDataset(args)
     valid_test_loader = data.DataLoader(dataset=valid_test_dataset,
@@ -80,6 +84,9 @@ def evaluate(model, args, x, y):
         result_tuple_list = list(map(lambda i: evaluate_mx2(pairs[i], 
         bps[i]), range(len(bps))))
         ps, rs, f1s = zip(*result_tuple_list)
+        print('--------------------------------')
+        print(seqs[0], utils.pairs2dot_bracket(bps[0]))
+        print('--------------------------------')
         return ps, rs, f1s
     
     elif (args.model == 'linearfold'):
@@ -96,6 +103,9 @@ def evaluate(model, args, x, y):
         result_tuple_list = list(map(lambda i: evaluate_mx2(pairs[i], 
         bps[i]), range(len(bps))))
         ps, rs, f1s = zip(*result_tuple_list)
+        print('--------------------------------')
+        print(seqs[0], utils.pairs2dot_bracket(bps[0]))
+        print('--------------------------------')
         return ps, rs, f1s
 
 def evaluate_e2e(pred_a, true_a):

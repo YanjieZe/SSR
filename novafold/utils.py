@@ -13,9 +13,9 @@ from models.e2efold.models import Lag_PP_NN, RNA_SS_e2e, Lag_PP_zero, Lag_PP_per
 from models.e2efold.models import ContactAttention_simple
 
 # mxfold2
-# from models.mxfold2.fold.mix import MixedFold
-# from models.mxfold2.fold.rnafold import RNAFold
-# from models.mxfold2.fold.zuker import ZukerFold
+from models.mxfold2.fold.mix import MixedFold
+from models.mxfold2.fold.rnafold import RNAFold
+from models.mxfold2.fold.zuker import ZukerFold
 
 def set_seed(seed):
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -294,3 +294,15 @@ def f1_loss(pred_a, true_a):
 
     f1 = torch.div(2*tp, (2*tp + fp + fn))
     return 1-f1.mean()
+
+
+def pairs2dot_bracket(pairs):
+    result = ""
+    for i in range(1, len(pairs)):
+        if pairs[i] == 0:
+            result += '.'
+        elif pairs[i] > i:
+            result += '('
+        else:
+            result += ')'
+    return result
