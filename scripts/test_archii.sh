@@ -32,7 +32,8 @@ LOSS='hinge'
 
 MAXLEN=600
 # set="archiveII_cleaned.lst"
-set="archiveII_valid.lst"
+# set="archiveII_valid.lst"
+set="test_seq.lst"
 # set="archiveII_pseudoknot.lst"
 
 cd novafold

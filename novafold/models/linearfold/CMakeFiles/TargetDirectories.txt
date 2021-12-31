@@ -1,5 +1,0 @@
-/home/purewhite/workspace/ai-proj/RNA-SSP/novafold/models/linearfold/CMakeFiles/rebuild_cache.dir
-/home/purewhite/workspace/ai-proj/RNA-SSP/novafold/models/linearfold/CMakeFiles/edit_cache.dir
-/home/purewhite/workspace/ai-proj/RNA-SSP/novafold/models/linearfold/CMakeFiles/pylinearfold.dir
-/home/purewhite/workspace/ai-proj/RNA-SSP/novafold/models/linearfold/pybind11/CMakeFiles/rebuild_cache.dir
-/home/purewhite/workspace/ai-proj/RNA-SSP/novafold/models/linearfold/pybind11/CMakeFiles/edit_cache.dir

@@ -21,7 +21,7 @@ int main() {
         }
         in.close();
         out.close();
-        out_lst << "data/inference_data/" + s.substr(0, s.size()-2) + "bpseq" << endl;
+        out_lst << "data/test_seq/" + s.substr(0, s.size()-2) + "bpseq" << endl;
     }
     out_lst.close();
     return 0;

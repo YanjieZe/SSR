@@ -1,1 +1,1 @@
-from .pylinearfold import predict
+from .build.pylinearfold import predict

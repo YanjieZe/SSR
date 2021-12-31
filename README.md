@@ -1,7 +1,13 @@
-# RNA-SSP
-RNA Secondary Structure Prediction. Final Project for CS410: AI.
+# SSR: A Unifed Framework for Prediction in **S**econdary **S**tructure of **R**NA 
+Yanjie Ze*, Qi Liu*, Xudong Lu*
 
-# mxfold2编译过程
+
+This is the official code for final project of CS410: AI.
+
+![](imgs/AI_structure.jpeg)
+
+
+# mxfold2和linear fold编译过程
 
 ```
 cd novafold/models/mxfold2/src/
